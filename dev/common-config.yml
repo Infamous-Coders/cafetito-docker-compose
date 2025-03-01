@@ -1,0 +1,11 @@
+services:
+  network-config:
+    networks:
+      - cafetito-network
+  microservice-config:
+    extends:
+      service: network-config
+    environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE: http://eurekaserver:1002/eureka/
+      SPRING_CONFIG_IMPORT: optional:configserver:http://configserver:1001/
+      SPRING_PROFILES_ACTIVE: dev

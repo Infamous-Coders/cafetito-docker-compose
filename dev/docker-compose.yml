@@ -1,0 +1,80 @@
+services:
+  configserver:
+    image: alexandevcwa/cafetito-ms-config-server:1.0.0
+    container_name: configserver-ms
+    ports:
+      - "1001:1001"
+    healthcheck:
+      test: "curl --fail --silent configserver:1001/actuator/health/readiness | grep UP || exit 1"
+      interval: 5s
+      timeout: 5s
+      retries: 4
+      start_period: 5s
+    extends:
+      service: network-config
+      file: common-config.yml
+    environment:
+      ENCRYPT_KEY: ${ENCRYPT_KEY}
+      SPRING_CLOUD_CONFIG_SERVER_GIT_URI: ${SERVER_GIT_URI}
+
+  eurekaserver:
+    image: alexandevcwa/cafetito-ms-eureka-server:1.0.0
+    container_name: eurekaserver-ms
+    ports:
+      - "1002:1002"
+    healthcheck:
+      test: "curl --fail --silent eurekaserver:1002/actuator/health/readiness | grep UP || exit 1"
+      interval: 5s
+      timeout: 5s
+      retries: 4
+      start_period: 5s
+    depends_on:
+      configserver:
+        condition: service_healthy
+    extends:
+      service: network-config
+      file: common-config.yml
+
+  auth:
+    image: alexandevcwa/cafetito-ms-auth:1.0.0
+    container_name: auth-ms
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: "curl --fail --silent auth:8080/api/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    depends_on:
+      eurekaserver:
+        condition: service_healthy
+    extends:
+      service: microservice-config
+      file: common-config.yml
+
+  gateway:
+    image: alexandevcwa/cafetito-ms-gateway:beta-1.0.0
+    container_name: gateway-ms
+    ports:
+      - "1000:1000"
+    healthcheck:
+      test: "curl --fail --silent gateway:1000/actuator/health/readiness | grep UP || exit 1"
+      interval: 5s
+      timeout: 5s
+      retries: 4
+      start_period: 5s
+    depends_on:
+      eurekaserver:
+        condition: service_healthy
+      configserver:
+        condition: service_healthy
+      auth:
+        condition: service_healthy
+    extends:
+      service: microservice-config
+      file: common-config.yml
+
+networks:
+  cafetito-network:
+    external: true
