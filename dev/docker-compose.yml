@@ -36,7 +36,7 @@ services:
       file: common-config.yml
 
   auth:
-    image: alexandevcwa/cafetito-ms-auth:1.0.0
+    image: alexandevcwa/cafetito-ms-auth:1.0.1
     container_name: auth-ms
     ports:
       - "8080:8080"
