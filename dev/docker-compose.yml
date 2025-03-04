@@ -73,9 +73,30 @@ services:
       service: microservice-config
       file: common-config.yml
 
+  accounts:
+    image: alexandevcwa/cafetito-ms-accounts:1.0.0
+    container_name: accounts-ms
+    ports:
+      - "8082:8082"
+    healthcheck:
+      test: "curl --fail --silent accounts:8082/api/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    depends_on:
+      eurekaserver:
+        condition: service_healthy
+      configserver:
+        condition: service_healthy
+    extends:
+      service: microservice-config
+      file: common-config.yml
+
+
   gateway:
     image: alexandevcwa/cafetito-ms-gateway:beta-1.0.0
-    container_name: gateway-ms
+    container_name: gatewayserver-ms
     ports:
       - "1000:1000"
     healthcheck:
