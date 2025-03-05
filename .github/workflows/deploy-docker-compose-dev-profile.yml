@@ -1,0 +1,23 @@
+name: Deploy Docker Compose Dev Profile
+
+on:
+  push:
+    paths:
+      - 'dev/docker-compose.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH Connection
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST_UMG }}
+          username: ${{ secrets.SSH_USER_UMG }}
+          key: ${{ secrets.SSH_KEY_UMG }}
+          script: |
+            cd /home/gcgadss/cafetito-docker-compose
+            git pull --all
+            cd dev
+            sudo docker compose down
+            sudo docker compose up -d
