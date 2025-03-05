@@ -16,7 +16,7 @@ jobs:
           username: ${{ secrets.SSH_USER_UMG }}
           key: ${{ secrets.SSH_KEY_UMG }}
           script: |
-            cd /home/gcgadss/cafetito-docker-compose
+            cd /home/umg/cafetito-docker-compose
             git pull --all
             cd dev
             sudo docker compose down
