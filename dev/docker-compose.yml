@@ -36,7 +36,7 @@ services:
       file: common-config.yml
 
   auth:
-    image: alexandevcwa/cafetito-ms-auth:1.0.2
+    image: alexandevcwa/cafetito-ms-auth:1.0.3
     container_name: auth-ms
     ports:
       - "8080:8080"
@@ -52,6 +52,8 @@ services:
     extends:
       service: microservice-config
       file: common-config.yml
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
 
   nits:
     image: alexandevcwa/cafetito-ms-nits:1.0.1
@@ -134,7 +136,7 @@ services:
       file: common-config.yml
 
   gateway:
-    image: alexandevcwa/cafetito-ms-gateway:beta-2.0.0
+    image: alexandevcwa/cafetito-ms-gateway:beta-3.0
     container_name: gatewayserver-ms
     ports:
       - "1000:1000"
@@ -156,6 +158,7 @@ services:
       file: common-config.yml
     environment:
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
+      JWT_SECRET: ${JWT_SECRET}
 
 networks:
   cafetito-network:
