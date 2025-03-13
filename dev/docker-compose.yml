@@ -16,7 +16,7 @@ services:
     environment:
       ENCRYPT_KEY: ${ENCRYPT_KEY}
       SPRING_CLOUD_CONFIG_SERVER_GIT_URI: ${SERVER_GIT_URI}
-
+####################################################################################################################
   eurekaserver:
     image: alexandevcwa/cafetito-ms-eureka-server:1.0.0
     container_name: eurekaserver-ms
@@ -34,7 +34,7 @@ services:
     extends:
       service: network-config
       file: common-config.yml
-
+####################################################################################################################
   auth:
     image: alexandevcwa/cafetito-ms-auth:1.0.3
     container_name: auth-ms
@@ -54,7 +54,7 @@ services:
       file: common-config.yml
     environment:
       JWT_SECRET: ${JWT_SECRET}
-
+####################################################################################################################
   nits:
     image: alexandevcwa/cafetito-ms-nits:1.0.1
     container_name: nits-ms
@@ -74,7 +74,7 @@ services:
     extends:
       service: microservice-config
       file: common-config.yml
-
+####################################################################################################################
   accounts:
     image: alexandevcwa/cafetito-ms-accounts:1.0.0
     container_name: accounts-ms
@@ -94,7 +94,7 @@ services:
     extends:
       service: microservice-config
       file: common-config.yml
-
+####################################################################################################################
   users:
     image: alexandevcwa/cafetito-ms-users:1.0.0
     container_name: users-ms
@@ -114,9 +114,9 @@ services:
     extends:
       service: microservice-config
       file: common-config.yml
-
+####################################################################################################################
   catalogs:
-    image: alexandevcwa/cafetito-ms-catalogs:1.0.0
+    image: alexandevcwa/cafetito-ms-catalogs:1.1.0
     container_name: catalogs-ms
     ports:
       - "8084:8084"
@@ -134,9 +134,31 @@ services:
     extends:
       service: microservice-config
       file: common-config.yml
-
+####################################################################################################################
+  transports:
+    image: alexandevcwa/cafetito-ms-transports:1.0.0
+    container_name: transports-ms
+    ports:
+      - "8085:8085"
+    healthcheck:
+      test: "curl --fail --silent transports:8085/api/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    depends_on:
+      eurekaserver:
+        condition: service_healthy
+      configserver:
+        condition: service_healthy
+      catalogs:
+        condition: service_healthy
+    extends:
+      service: microservice-config
+      file: common-config.yml
+####################################################################################################################
   gateway:
-    image: alexandevcwa/cafetito-ms-gateway:beta-3.0
+    image: alexandevcwa/cafetito-ms-gateway:beta-3.3
     container_name: gatewayserver-ms
     ports:
       - "1000:1000"
@@ -159,7 +181,7 @@ services:
     environment:
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
       JWT_SECRET: ${JWT_SECRET}
-
+####################################################################################################################
 networks:
   cafetito-network:
     external: true
