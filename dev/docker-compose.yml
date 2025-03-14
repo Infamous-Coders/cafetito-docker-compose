@@ -36,7 +36,7 @@ services:
       file: common-config.yml
 ####################################################################################################################
   auth:
-    image: alexandevcwa/cafetito-ms-auth:1.0.3
+    image: alexandevcwa/cafetito-ms-auth:1.0.4
     container_name: auth-ms
     ports:
       - "8080:8080"
@@ -136,7 +136,7 @@ services:
       file: common-config.yml
 ####################################################################################################################
   transports:
-    image: alexandevcwa/cafetito-ms-transports:1.0.0
+    image: alexandevcwa/cafetito-ms-transports:1.1.0
     container_name: transports-ms
     ports:
       - "8085:8085"
