@@ -158,7 +158,7 @@ services:
       file: common-config.yml
 ####################################################################################################################
   gateway:
-    image: alexandevcwa/cafetito-ms-gateway:beta-3.3
+    image: alexandevcwa/cafetito-ms-gateway:1.0.0
     container_name: gatewayserver-ms
     ports:
       - "1000:1000"
