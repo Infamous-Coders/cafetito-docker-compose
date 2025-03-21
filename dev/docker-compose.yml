@@ -190,7 +190,7 @@ services:
 ####################################################################################################################
   transporters:
     image: alexandevcwa/cafetito-ms-transporters:1.0.0
-    container_name: weighings-ms
+    container_name: transporters-ms
     ports:
       - "8087:8087"
     restart: unless-stopped
