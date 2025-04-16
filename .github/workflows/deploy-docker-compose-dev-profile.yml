@@ -2,22 +2,100 @@ name: Deploy Docker Compose Dev Profile
 
 on:
   push:
+    branches:
+      - develop
     paths:
       - 'dev/docker-compose.yml'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: SSH Connection
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST_UMG }}
-          username: ${{ secrets.SSH_USER_UMG }}
-          key: ${{ secrets.SSH_KEY_UMG }}
-          script: |
-            cd /home/umg/cafetito-docker-compose
-            git pull --all
-            cd dev
-            sudo docker compose down
-            sudo docker compose up -d
+
+      - name: Instalar Cloudflared
+        run: |
+          curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
+          chmod +x cloudflared
+          sudo mv cloudflared /usr/local/bin/cloudflared
+
+      - name: Configurar clave SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Crear archivo SSH config con Cloudflared
+        run: |
+          cat <<EOF > ~/.ssh/config
+          Host sshserver
+            HostName ${{ secrets.DOMAIN }}
+            User ${{ secrets.USERNAME }}
+            IdentityFile ~/.ssh/id_rsa
+            StrictHostKeyChecking no
+            ProxyCommand cloudflared access ssh --hostname %h
+          EOF
+          chmod 600 ~/.ssh/config
+
+      - name: Ejecutar comandos en el servidor remoto
+        script: |
+          set -e
+          
+          echo "📦 Cambiando al repositorio..."
+          cd /mnt/nvme01/cafetito/repositories
+          
+          if [ ! -d "cafetito-docker-compose" ]; then
+          
+            git clone git@github.com:Infamous-Coders/cafetito-docker-compose.git
+            echo "✅ Repositorio clonado."
+          
+          else
+          
+            echo "✅ El repositorio ya existe."
+            cd cafetito-docker-compose
+          
+            echo "🗂️ Haciendo backup temporal..."  
+            cp -r dev dev_backup_$(date +%s)
+          fi
+          
+          PREVIOUS_COMMIT=$(git rev-parse HEAD)
+          echo "🔽 Actualizando a la última versión el repositorio..."
+          git fetch origin develop || {
+            echo "❌ Error al actualizar el repositorio. Abortando."
+            exit 1
+          }
+          CHANGED=$(git diff --name-only HEAD origin/develop)
+          echo "✅ Repositorio actualizado."
+          
+          if [ -z "$CHANGED" ]; then
+          echo "✅ No hay cambios para aplicar. Fin del proceso."
+          exit 0
+          fi
+          
+          cd dev
+          
+          echo "🧹 Bajando contenedores actuales..."
+          sudo docker compose down
+          
+          echo "🚀 Levantando nuevos contenedores..."
+          if ! sudo docker compose up -d; then
+            echo "❌ Docker Compose falló. Haciendo rollback..."
+          
+          # Rollback del código
+          cd ..
+          git reset --hard "$PREVIOUS_COMMIT"
+          rm -rf dev
+          mv dev_backup_* dev
+          
+          # Rollback de contenedores
+          cd dev
+          sudo docker compose up -d || {
+          echo "🔥 Rollback también falló. Revisión manual requerida."
+          exit 1
+          }
+          
+          echo "✅ Rollback exitoso."
+          exit 1
+          fi
+          
+          echo "✅ Deploy finalizado con éxito."
