@@ -2,8 +2,6 @@ name: Deploy Docker Compose Dev Profile
 
 on:
   push:
-    branches:
-      - develop
     paths:
       - 'dev/docker-compose.yml'
 
