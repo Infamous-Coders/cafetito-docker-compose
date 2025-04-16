@@ -45,6 +45,7 @@ jobs:
           
             git clone git@github.com:Infamous-Coders/cafetito-docker-compose.git
             echo "✅ Repositorio clonado."
+            cd cafetito-docker-compose
           
           else
           
@@ -62,6 +63,7 @@ jobs:
             exit 1
           }
           git switch develop
+          
           CHANGED=$(git diff --name-only HEAD origin/develop)
           echo "✅ Repositorio actualizado."
           
