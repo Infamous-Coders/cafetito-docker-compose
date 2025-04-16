@@ -189,13 +189,36 @@ services:
       file: common-config.yml
 ####################################################################################################################
   transporters:
-    image: alexandevcwa/cafetito-ms-transporters:1.0.0
+    image: alexandevcwa/cafetito-ms-transporters:1.0.1
     container_name: transporters-ms
     ports:
       - "8087:8087"
     restart: unless-stopped
     healthcheck:
       test: "curl --fail --silent transporters:8087/api/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    depends_on:
+      eurekaserver:
+        condition: service_healthy
+      configserver:
+        condition: service_healthy
+      catalogs:
+        condition: service_healthy
+    extends:
+      service: microservice-config
+      file: common-config.yml
+####################################################################################################################
+  pilots:
+    image: alexandevcwa/cafetito-ms-pilots:1.0.0
+    container_name: pilots-ms
+    ports:
+      - "8088:8088"
+    restart: unless-stopped
+    healthcheck:
+      test: "curl --fail --silent pilots:8088/api/actuator/health/readiness | grep UP || exit 1"
       interval: 10s
       timeout: 5s
       retries: 10
