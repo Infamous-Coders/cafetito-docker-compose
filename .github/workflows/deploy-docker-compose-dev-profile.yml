@@ -2,6 +2,8 @@ name: Deploy Docker Compose Dev Profile
 
 on:
   push:
+    branches:
+      - develop
     paths:
       - 'dev/docker-compose.yml'
 
@@ -59,6 +61,7 @@ jobs:
             echo "❌ Error al actualizar el repositorio. Abortando."
             exit 1
           }
+          git switch develop
           CHANGED=$(git diff --name-only HEAD origin/develop)
           echo "✅ Repositorio actualizado."
           
