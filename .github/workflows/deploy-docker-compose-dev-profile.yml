@@ -71,13 +71,6 @@ jobs:
             exit 1
           }
           
-          CHANGED=$(git diff --name-only HEAD origin/develop)
-          echo "✅ Repositorio actualizado."
-          
-          if [ -z "$CHANGED" ]; then
-          echo "✅ No hay cambios para aplicar. Fin del proceso."
-          exit 0
-          fi
           
           cd dev
           
@@ -97,10 +90,10 @@ jobs:
             echo "❌ Docker Compose falló. Haciendo rollback..."
           
           # Rollback del código
-          cd ..
+          cd ../
           git reset --hard "$PREVIOUS_COMMIT"
           rm -rf dev
-          mv dev_backup_* dev
+          cp -r dev_backup_* dev
           
           # Rollback de contenedores
           cd dev
@@ -112,6 +105,11 @@ jobs:
           echo "✅ Rollback exitoso."
           exit 1
           fi
+          
+          echo "🧹 Limpiando imágenes antiguas..."
+          sudo docker image prune -f
+          cd ../
+          rm -rf dev_backup_*
           
           echo "✅ Deploy finalizado con éxito."
           
