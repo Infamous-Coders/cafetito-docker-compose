@@ -57,7 +57,7 @@ jobs:
             cp -r dev dev_backup_$(date +%s)
           fi
           
-          PREVIOUS_COMMIT=$(git rev-parse HEAD)
+          PREVIOUS_COMMIT=$(git rev-parse origin/develop)
           echo "🔽 Actualizando a la última versión el repositorio..."
           
           if git branch | grep "develop"; then
@@ -70,7 +70,6 @@ jobs:
             echo "❌ Error al actualizar el repositorio. Abortando."
             exit 1
           }
-          git switch develop
           
           CHANGED=$(git diff --name-only HEAD origin/develop)
           echo "✅ Repositorio actualizado."
@@ -79,6 +78,7 @@ jobs:
           echo "✅ No hay cambios para aplicar. Fin del proceso."
           exit 0
           fi
+          
           cd dev
           
           if [ ! -f ".env" ]; then
