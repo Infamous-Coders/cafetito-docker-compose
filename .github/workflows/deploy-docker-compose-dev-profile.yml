@@ -8,21 +8,17 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-
       - name: Instalar Cloudflared
         run: |
           curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
           chmod +x cloudflared
           sudo mv cloudflared /usr/local/bin/cloudflared
-
       - name: Configurar clave SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-
       - name: Crear archivo SSH config con Cloudflared
         run: |
           cat <<EOF > ~/.ssh/config
@@ -34,9 +30,10 @@ jobs:
             ProxyCommand cloudflared access ssh --hostname %h
           EOF
           chmod 600 ~/.ssh/config
-
       - name: Ejecutar comandos en el servidor remoto
-        script: |
+        run: |
+          ssh sshserver << 'EOF'
+          
           set -e
           
           echo "📦 Cambiando al repositorio..."
@@ -97,3 +94,5 @@ jobs:
           fi
           
           echo "✅ Deploy finalizado con éxito."
+          
+          EOF
