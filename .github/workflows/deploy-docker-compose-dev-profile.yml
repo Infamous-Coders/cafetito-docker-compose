@@ -71,8 +71,15 @@ jobs:
           echo "✅ No hay cambios para aplicar. Fin del proceso."
           exit 0
           fi
-          
           cd dev
+          
+          rm .env
+          touch .env
+          
+          echo "ENCRYPT_KEY=$ENCRYPT_KEY" >> .env
+          echo "JWT_SECRET=$JWT_SECRET" >> .env
+          echo "SERVER_GIT_URI=$SERVER_GIT_URI" >> .env
+          echo "CORS_ALLOWED_ORIGINS=$CORS_ALLOWED_ORIGINS" >> .env
           
           echo "🧹 Bajando contenedores actuales..."
           sudo docker compose down
