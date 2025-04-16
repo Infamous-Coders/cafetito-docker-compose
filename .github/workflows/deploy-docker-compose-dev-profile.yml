@@ -92,8 +92,8 @@ jobs:
           # Rollback del código
           cd ../
           git reset --hard "$PREVIOUS_COMMIT"
-          rm -rf dev
           cp -r dev_backup_* dev
+          rm -rf dev_backup_*
           
           # Rollback de contenedores
           cd dev
