@@ -166,7 +166,7 @@ services:
       file: common-config.yml
 ####################################################################################################################
   weighings:
-    image: alexandevcwa/cafetito-ms-weighings:1.1.0
+    image: alexandevcwa/cafetito-ms-weighings:1.2.0
     container_name: weighings-ms
     ports:
       - "8086:8086"
