@@ -2,8 +2,11 @@ name: Deploy Docker Compose Dev Profile
 
 on:
   push:
+    branches:
+      - develop
     paths:
       - 'dev/docker-compose.yml'
+      - .github/workflows/deploy-docker-compose-dev-profile.yml
 
 jobs:
   deploy:
@@ -43,6 +46,7 @@ jobs:
           
             git clone git@github.com:Infamous-Coders/cafetito-docker-compose.git
             echo "✅ Repositorio clonado."
+            cd cafetito-docker-compose
           
           else
           
@@ -53,21 +57,30 @@ jobs:
             cp -r dev dev_backup_$(date +%s)
           fi
           
-          PREVIOUS_COMMIT=$(git rev-parse HEAD)
+          PREVIOUS_COMMIT=$(git rev-parse origin/develop)
           echo "🔽 Actualizando a la última versión el repositorio..."
-          git fetch origin develop || {
+          
+          if git branch | grep "develop"; then
+            git switch develop
+          else
+            git checkout -b develop origin/develop
+          fi
+          
+          git pull origin develop || {
             echo "❌ Error al actualizar el repositorio. Abortando."
             exit 1
           }
-          CHANGED=$(git diff --name-only HEAD origin/develop)
-          echo "✅ Repositorio actualizado."
           
-          if [ -z "$CHANGED" ]; then
-          echo "✅ No hay cambios para aplicar. Fin del proceso."
-          exit 0
-          fi
           
           cd dev
+          
+          if [ ! -f ".env" ]; then
+            touch .env
+            echo "ENCRYPT_KEY=$ENCRYPT_KEY" >> .env
+            echo "JWT_SECRET=$JWT_SECRET" >> .env
+            echo "SERVER_GIT_URI=$SERVER_GIT_URI" >> .env
+            echo "CORS_ALLOWED_ORIGINS=$CORS_ALLOWED_ORIGINS" >> .env
+          fi
           
           echo "🧹 Bajando contenedores actuales..."
           sudo docker compose down
@@ -77,10 +90,10 @@ jobs:
             echo "❌ Docker Compose falló. Haciendo rollback..."
           
           # Rollback del código
-          cd ..
+          cd ../
           git reset --hard "$PREVIOUS_COMMIT"
-          rm -rf dev
-          mv dev_backup_* dev
+          cp -r dev_backup_* dev
+          rm -rf dev_backup_*
           
           # Rollback de contenedores
           cd dev
@@ -92,6 +105,11 @@ jobs:
           echo "✅ Rollback exitoso."
           exit 1
           fi
+          
+          echo "🧹 Limpiando imágenes antiguas..."
+          sudo docker image prune -f
+          cd ../
+          rm -rf dev_backup_*
           
           echo "✅ Deploy finalizado con éxito."
           
