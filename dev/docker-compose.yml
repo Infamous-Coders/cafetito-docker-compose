@@ -246,7 +246,7 @@ services:
 
 ####################################################################################################################
   beneficion_transportistas:
-    image: alexandevcwa/cafetito-ms-beneficio-transportistas:1.0.0
+    image: alexandevcwa/cafetito-ms-beneficio-transportistas:1.1.0
     container_name: beneficion_transportistas-ms
     ports:
       - "8089:8089"
@@ -266,7 +266,7 @@ services:
 
 ####################################################################################################################
   gateway:
-    image: alexandevcwa/cafetito-ms-gateway:1.0.4
+    image: alexandevcwa/cafetito-ms-gateway:1.1.0
     container_name: gatewayserver-ms
     ports:
       - "1000:1000"
