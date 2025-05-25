@@ -150,7 +150,7 @@ services:
 
 ####################################################################################################################
   transports:
-    image: alexandevcwa/cafetito-ms-transports:1.2.0
+    image: alexandevcwa/cafetito-ms-transports:1.6.0
     container_name: transports-ms
     ports:
       - "8085:8085"
@@ -174,7 +174,7 @@ services:
 
 ####################################################################################################################
   weighings:
-    image: alexandevcwa/cafetito-ms-weighings:1.2.0
+    image: alexandevcwa/cafetito-ms-weighings:1.4.0
     container_name: weighings-ms
     ports:
       - "8086:8086"
@@ -264,9 +264,29 @@ services:
       service: microservice-config
       file: common-config.yml
 
+  ####################################################################################################################
+  beneficion_transportes:
+    image: alexandevcwa/cafetito-ms-beneficio-transportes:1.0.0
+    container_name: beneficion_transportes-ms
+    ports:
+      - "8090:8090"
+    restart: unless-stopped
+    healthcheck:
+      test: "curl --fail --silent beneficion_transportes:8090/api/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    depends_on:
+      eurekaserver:
+        condition: service_healthy
+    extends:
+      service: microservice-config
+      file: common-config.yml
+
 ####################################################################################################################
   gateway:
-    image: alexandevcwa/cafetito-ms-gateway:1.1.0
+    image: alexandevcwa/cafetito-ms-gateway:1.3.0
     container_name: gatewayserver-ms
     ports:
       - "1000:1000"
