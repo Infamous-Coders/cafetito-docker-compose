@@ -106,7 +106,7 @@ services:
 
   ####################################################################################################################
   users:
-    image: alexandevcwa/cafetito-ms-users:1.2.0
+    image: alexandevcwa/cafetito-ms-users:1.2.1
     container_name: users-ms
     ports:
       - "8083:8083"
