@@ -106,7 +106,7 @@ services:
 
   ####################################################################################################################
   users:
-    image: alexandevcwa/cafetito-ms-users:1.1.0
+    image: alexandevcwa/cafetito-ms-users:1.2.1
     container_name: users-ms
     ports:
       - "8083:8083"
@@ -150,7 +150,7 @@ services:
 
   ####################################################################################################################
   transports:
-    image: alexandevcwa/cafetito-ms-transports:1.7.0
+    image: alexandevcwa/cafetito-ms-transports:1.7.1
     container_name: transports-ms
     ports:
       - "8085:8085"
@@ -174,7 +174,7 @@ services:
 
   ####################################################################################################################
   weighings:
-    image: alexandevcwa/cafetito-ms-weighings:1.5.0
+    image: alexandevcwa/cafetito-ms-weighings:1.5.3
     container_name: weighings-ms
     ports:
       - "8086:8086"
@@ -222,7 +222,7 @@ services:
 
   ####################################################################################################################
   pilots:
-    image: alexandevcwa/cafetito-ms-pilots:1.4.0
+    image: alexandevcwa/cafetito-ms-pilots:1.4.1
     container_name: pilots-ms
     ports:
       - "8088:8088"
@@ -286,7 +286,7 @@ services:
 
     ####################################################################################################################
   bascula:
-    image: alexandevcwa/cafetito-ms-bascula:1.1.0
+    image: alexandevcwa/cafetito-ms-bascula:1.1.1
     container_name: bascula-ms
     ports:
       - "8091:8091"
@@ -315,6 +315,26 @@ services:
     restart: unless-stopped
     healthcheck:
       test: "curl --fail --silent beneficio_agricultor:8092/api/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    depends_on:
+      eurekaserver:
+        condition: service_healthy
+    extends:
+      service: microservice-config
+      file: common-config.yml
+
+    ####################################################################################################################
+  beneficio_cuentas:
+    image: alexandevcwa/cafetito-ms-beneficio-cuentas:1.0.1
+    container_name: beneficio_cuentas-ms
+    ports:
+      - "8093:8093"
+    restart: unless-stopped
+    healthcheck:
+      test: "curl --fail --silent beneficio_cuentas:8093/api/actuator/health/readiness | grep UP || exit 1"
       interval: 10s
       timeout: 5s
       retries: 10
