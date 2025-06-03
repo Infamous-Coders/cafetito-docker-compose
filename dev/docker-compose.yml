@@ -222,7 +222,7 @@ services:
 
   ####################################################################################################################
   pilots:
-    image: alexandevcwa/cafetito-ms-pilots:1.4.0
+    image: alexandevcwa/cafetito-ms-pilots:1.4.1
     container_name: pilots-ms
     ports:
       - "8088:8088"
