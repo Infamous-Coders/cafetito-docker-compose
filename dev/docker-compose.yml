@@ -150,7 +150,7 @@ services:
 
   ####################################################################################################################
   transports:
-    image: alexandevcwa/cafetito-ms-transports:1.7.0
+    image: alexandevcwa/cafetito-ms-transports:1.7.1
     container_name: transports-ms
     ports:
       - "8085:8085"
