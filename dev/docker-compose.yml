@@ -328,7 +328,7 @@ services:
 
     ####################################################################################################################
   beneficio_cuentas:
-    image: alexandevcwa/cafetito-ms-beneficio-cuentas:1.0.1
+    image: alexandevcwa/cafetito-ms-beneficio-cuentas:1.1.0
     container_name: beneficio_cuentas-ms
     ports:
       - "8093:8093"
